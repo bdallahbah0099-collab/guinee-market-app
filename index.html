@@ -1,5 +1,7 @@
 
 
+
+
 <!DOCTYPE html>
 
 <html lang="fr">
@@ -8,55 +10,53 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Guinée Market</title>
 
 <style>
 
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box}
 
-body{font-family:Arial,sans-serif;background:#f4f5f7;color:#222}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f5;color:#222}
 
-header{background:#087b43;color:white;padding:22px 15px;text-align:center}
+header{background:#087b43;color:white;padding:20px;text-align:center}
 
-header h1{font-size:27px}
+header h1{margin:0;font-size:27px}
 
-header p{margin-top:7px}
+header p{margin:7px}
 
 .search{padding:15px}
 
-.search input{width:100%;padding:14px;border:1px solid #ddd;border-radius:9px;font-size:16px}
+input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:9px;font-size:16px;margin-bottom:10px}
 
-.categories{display:flex;gap:9px;overflow-x:auto;padding:5px 15px 15px}
+.categories{display:flex;gap:9px;overflow:auto;padding:5px 15px 15px}
 
-.categories button{border:0;background:white;padding:12px;border-radius:20px;white-space:nowrap}
+.categories button{border:0;background:white;padding:12px 17px;border-radius:20px;white-space:nowrap}
 
 .categories button.active{background:#087b43;color:white}
 
-h2{padding:15px;font-size:20px}
+h2{padding:0 15px;font-size:20px}
 
 .products{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
 
-.product{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 7px #ddd}
+.card{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 7px #ddd}
 
-.product img{width:100%;height:135px;object-fit:cover}
+.card img{width:100%;height:145px;object-fit:cover;background:#eee}
 
-.product .info{padding:10px}
+.info{padding:10px}
 
-.product h3{font-size:15px;margin-bottom:8px}
+.price{color:#087b43;font-weight:bold;font-size:17px}
 
-.price{color:#087b43;font-weight:bold;margin-bottom:8px}
+.info button,.publish{width:100%;padding:11px;border:0;border-radius:8px;background:#087b43;color:white;margin-top:8px}
 
-.product button,.publish{background:#087b43;color:white;border:0;padding:10px;border-radius:7px;width:100%}
+.publish{font-size:17px;padding:15px}
 
-form{background:white;margin:15px;padding:15px;border-radius:12px}
+form{padding:15px;background:white;margin:15px;border-radius:12px}
 
-form input,form textarea{width:100%;padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:7px;font-size:15px}
+footer{text-align:center;padding:25px;background:#087b43;color:white;margin-top:20px}
 
-.publish{padding:13px;font-size:16px}
-
-footer{text-align:center;padding:25px;color:#666}
+.empty{text-align:center;padding:30px}
 
 </style>
 
@@ -66,31 +66,29 @@ footer{text-align:center;padding:25px;color:#666}
 
 <header>
 
-<h1>🇬🇳 GUINÉE MARKET</h1>
+<h1>🇬🇳 Guinée Market</h1>
 
-<p>Achetez et vendez partout en Guinée</p>
+<p>Achetez et vendez facilement en Guinée</p>
 
 </header>
 
 <div class="search">
 
-<input id="search" placeholder="🔎 Rechercher un produit..." oninput="render()">
+<input id="search" placeholder="🔍 Rechercher un produit...">
 
 </div>
 
 <div class="categories" id="categories">
 
-<button class="active" onclick="category('Tous',this)">Tous</button>
+<button class="active" onclick="filter('Tous',this)">Tous</button>
 
-<button onclick="category('Téléphones',this)">📱 Téléphones</button>
+<button onclick="filter('Téléphones',this)">Téléphones</button>
 
-<button onclick="category('Vêtements',this)">👕 Vêtements</button>
+<button onclick="filter('Mode',this)">Mode</button>
 
-<button onclick="category('Chaussures',this)">👟 Chaussures</button>
+<button onclick="filter('Maison',this)">Maison</button>
 
-<button onclick="category('Accessoires',this)">🎧 Accessoires</button>
-
-<button onclick="category('Autres',this)">Autres</button>
+<button onclick="filter('Véhicules',this)">Véhicules</button>
 
 </div>
 
@@ -98,33 +96,29 @@ footer{text-align:center;padding:25px;color:#666}
 
 <div class="products" id="products"></div>
 
-<h2>➕ Publier une annonce</h2>
+<h2>➕ Vendre un produit</h2>
 
-<form onsubmit="addProduct(event)">
+<form id="form">
 
 <input id="name" placeholder="Nom du produit" required>
 
 <input id="price" type="number" placeholder="Prix en GNF" required>
 
-<input id="phone" type="tel" placeholder="Numéro WhatsApp (ex: 224620000000)" required>
-
-<input id="photo" type="url" placeholder="Lien de la photo (facultatif)">
-
-<select id="cat" style="width:100%;padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:7px">
+<select id="category">
 
 <option>Téléphones</option>
 
-<option>Vêtements</option>
+<option>Mode</option>
 
-<option>Chaussures</option>
+<option>Maison</option>
 
-<option>Accessoires</option>
-
-<option>Autres</option>
+<option>Véhicules</option>
 
 </select>
 
-<textarea id="description" placeholder="Description du produit"></textarea>
+<input id="image" type="url" placeholder="Lien de la photo du produit">
+
+<input id="phone" placeholder="Numéro WhatsApp" required>
 
 <button class="publish">Publier mon produit</button>
 
@@ -132,103 +126,125 @@ footer{text-align:center;padding:25px;color:#666}
 
 <footer>
 
-🇬🇳 Guinée Market — Le marché de tous les Guinéens
+<strong>Guinée Market 🇬🇳</strong>
+
+<p>Le marché en ligne de la Guinée.</p>
 
 </footer>
 
 <script>
 
-let items = [
+let items=JSON.parse(localStorage.getItem('gm_items')||'[]');
 
-{name:"Téléphone Android",price:1500000,cat:"Téléphones",photo:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500",phone:"224620000000"},
+let selected='Tous';
 
-{name:"Chaussures modernes",price:250000,cat:"Chaussures",photo:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",phone:"224620000000"},
+function render(){
 
-{name:"Écouteurs",price:100000,cat:"Accessoires",photo:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",phone:"224620000000"},
+let q=document.getElementById('search').value.toLowerCase();
 
-{name:"T-shirt",price:120000,cat:"Vêtements",photo:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",phone:"224620000000"}
+let list=items.filter(p=>
 
-];
+(selected==='Tous'||p.category===selected)&&
 
-let selected="Tous";
+p.name.toLowerCase().includes(q)
 
-function category(cat,btn){
+);
 
-selected=cat;
+let area=document.getElementById('products');
 
-document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
+area.innerHTML='';
 
-btn.classList.add("active");
+if(!list.length){area.innerHTML='<div class="empty">Aucun produit trouvé.</div>';return}
+
+list.forEach(p=>{
+
+let card=document.createElement('div');
+
+card.className='card';
+
+let img=document.createElement('img');
+
+img.src=p.image||'https://placehold.co/400x300?text=Produit';
+
+img.alt=p.name;
+
+let info=document.createElement('div');
+
+info.className='info';
+
+let title=document.createElement('strong');
+
+title.textContent=p.name;
+
+let price=document.createElement('p');
+
+price.className='price';
+
+price.textContent=Number(p.price).toLocaleString('fr-FR')+' GNF';
+
+let contact=document.createElement('button');
+
+contact.textContent='Contacter le vendeur';
+
+contact.onclick=()=>window.open('https://wa.me/'+p.phone.replace(/\D/g,''),'_blank');
+
+info.append(title,price,contact);
+
+card.append(img,info);
+
+area.append(card);
+
+});
+
+}
+
+function filter(category,button){
+
+selected=category;
+
+document.querySelectorAll('.categories button').forEach(b=>b.classList.remove('active'));
+
+button.classList.add('active');
 
 render();
 
 }
 
-function render(){
+document.getElementById('search').addEventListener('input',render);
 
-let q=document.getElementById("search").value.toLowerCase();
-
-let filtered=items.filter(p=>(selected==="Tous"||p.cat===selected)&&p.name.toLowerCase().includes(q));
-
-document.getElementById("products").innerHTML=filtered.map(p=>`
-
-<div class="product">
-
-<img src="${p.photo || 'https://placehold.co/400x300?text=Produit'}" onerror="this.src='https://placehold.co/400x300?text=Produit'">
-
-<div class="info">
-
-<h3>${p.name}</h3>
-
-<div class="price">${Number(p.price).toLocaleString("fr-FR")} GNF</div>
-
-<button onclick="contact('${p.phone}','${p.name.replace(/'/g,"")}')">Contacter sur WhatsApp</button>
-
-</div>
-
-</div>`).join("") || "<p>Aucun produit trouvé.</p>";
-
-}
-
-function contact(phone,name){
-
-if(!phone){alert("Numéro du vendeur non renseigné");return}
-
-window.open("https://wa.me/"+phone.replace(/\D/g,"")+"?text="+encodeURIComponent("Bonjour, je suis intéressé par "+name)," _blank");
-
-}
-
-function addProduct(e){
+document.getElementById('form').addEventListener('submit',e=>{
 
 e.preventDefault();
 
 items.unshift({
 
-name:document.getElementById("name").value,
+name:document.getElementById('name').value,
 
-price:Number(document.getElementById("price").value),
+price:document.getElementById('price').value,
 
-phone:document.getElementById("phone").value,
+category:document.getElementById('category').value,
 
-photo:document.getElementById("photo").value,
+image:document.getElementById('image').value,
 
-cat:document.getElementById("cat").value
+phone:document.getElementById('phone').value
 
 });
 
+localStorage.setItem('gm_items',JSON.stringify(items));
+
 e.target.reset();
 
-selected="Tous";
+selected='Tous';
 
-document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
+document.querySelectorAll('.categories button').forEach(b=>b.classList.remove('active'));
 
-document.querySelector(".categories button").classList.add("active");
+document.querySelector('.categories button').classList.add('active');
 
 render();
 
-alert("Annonce ajoutée sur cette page !");
+alert('Produit publié sur cet appareil !');
 
-}
+});
 
 render();
 
