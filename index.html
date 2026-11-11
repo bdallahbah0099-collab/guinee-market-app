@@ -3,23 +3,25 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Guinée Market</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#f4f6f4;color:#222}
-header{background:#087b43;color:white;padding:22px;text-align:center}
+body{margin:0;font-family:Arial;background:#f3f6f3;color:#222}
+header{background:#087b43;color:white;text-align:center;padding:22px}
 header h1{margin:0}
-.search{padding:15px}
-input{width:100%;padding:14px;border:1px solid #ddd;border-radius:10px}
-h2{padding:0 15px}
-.categories{display:flex;gap:10px;overflow:auto;padding:10px 15px}
-.categories button{padding:12px;border:0;border-radius:20px;background:white;white-space:nowrap}
-.categories button:first-child{background:#087b43;color:white}
-.products{padding:15px}
-.product{background:white;padding:18px;margin-bottom:12px;border-radius:12px}
-.product button{background:#087b43;color:white;border:0;padding:10px 15px;border-radius:8px}
-footer{text-align:center;padding:20px;color:#666}
+main{padding:15px;max-width:700px;margin:auto}
+input,select,button{font:inherit}
+input,select{width:100%;padding:13px;margin:7px 0;border:1px solid #ccc;border-radius:9px;background:white}
+button{border:0;border-radius:9px;padding:12px;background:#087b43;color:white;cursor:pointer}
+h2{margin-top:25px}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.product{background:white;border-radius:12px;padding:10px;overflow:hidden}
+.product img{width:100%;height:130px;object-fit:cover;border-radius:8px}
+.product h3{font-size:16px;margin:8px 0}
+.price{color:#087b43;font-weight:bold}
+.form{background:white;padding:15px;border-radius:12px}
+#message{color:#087b43;font-weight:bold}
 </style>
 </head>
 <body>
@@ -27,40 +29,108 @@ footer{text-align:center;padding:20px;color:#666}
 <h1>🇬🇳 Guinée Market</h1>
 <p>Achetez et vendez facilement en Guinée</p>
 </header>
-<div class="search">
-<input type="search" placeholder="Rechercher un produit...">
-</div>
-<h2>Catégories</h2>
-<div class="categories">
-<button>Tout</button>
-<button>Téléphones</button>
-<button>Vêtements</button>
-<button>Maison</button>
-<button>Véhicules</button>
-</div>
-<h2>Produits populaires</h2>
-<div class="products">
-<div class="product">
-<h3>📱 Téléphones</h3>
-<p>Découvrez les téléphones disponibles.</p>
-<button>Voir les produits</button>
-</div>
-<div class="product">
-<h3>👕 Vêtements</h3>
-<p>Découvrez les vêtements disponibles.</p>
-<button>Voir les produits</button>
-</div>
-<div class="product">
-<h3>🏠 Maison</h3>
-<p>Découvrez les articles pour la maison.</p>
-<button>Voir les produits</button>
-</div>
-</div>
-<footer>© 2026 Guinée Market</footer>
+
+<main>
+<input id="search" type="search" placeholder="Rechercher un produit...">
+
+<h2>Publier un produit</h2>
+<form class="form" id="productForm">
+<input id="name" placeholder="Nom du produit" required>
+<input id="price" type="number" min="1" placeholder="Prix en GNF" required>
+<select id="category" required>
+<option value="">Choisir une catégorie</option>
+<option>Téléphones</option>
+<option>Vêtements</option>
+<option>Maison</option>
+<option>Véhicules</option>
+<option>Autres</option>
+</select>
+<label>Photo du produit</label>
+<input id="photo" type="file" accept="image/*" required>
+<button type="submit">Publier mon produit</button>
+<p id="message"></p>
+</form>
+
+<h2>Produits disponibles</h2>
+<div class="products" id="products"></div>
+</main>
+
+<script>
+const form=document.getElementById("productForm");
+const list=document.getElementById("products");
+const message=document.getElementById("message");
+const search=document.getElementById("search");
+
+let products=[];
+try{
+ products=JSON.parse(localStorage.getItem("guineeMarketProducts")||"[]");
+}catch(e){products=[];}
+
+function displayProducts(){
+ const term=search.value.toLowerCase();
+ list.innerHTML="";
+ const filtered=products.filter(p=>
+  (p.name+" "+p.category).toLowerCase().includes(term)
+ );
+ if(filtered.length===0){
+  list.innerHTML="<p>Aucun produit pour le moment.</p>";
+  return;
+ }
+ filtered.forEach(p=>{
+  const card=document.createElement("div");
+  card.className="product";
+  const img=document.createElement("img");
+  img.src=p.photo;
+  img.alt=p.name;
+  const title=document.createElement("h3");
+  title.textContent=p.name;
+  const price=document.createElement("p");
+  price.className="price";
+  price.textContent=Number(p.price).toLocaleString("fr-FR")+" GNF";
+  const category=document.createElement("p");
+  category.textContent=p.category;
+  card.append(img,title,price,category);
+  list.appendChild(card);
+ });
+}
+
+form.addEventListener("submit",function(e){
+ e.preventDefault();
+ const name=document.getElementById("name").value.trim();
+ const price=document.getElementById("price").value;
+ const category=document.getElementById("category").value;
+ const file=document.getElementById("photo").files[0];
+
+ if(!name||!price||Number(price)<=0||!category||!file){
+  message.textContent="Remplis tous les champs.";
+  return;
+ }
+ if(file.size>1500000){
+  message.textContent="Choisis une photo de moins de 1,5 Mo.";
+  return;
+ }
+ const reader=new FileReader();
+ reader.onload=function(){
+  const product={name,price,category,photo:reader.result};
+  products.unshift(product);
+  try{
+   localStorage.setItem("guineeMarketProducts",JSON.stringify(products));
+   displayProducts();
+   form.reset();
+   message.textContent="Produit publié avec succès !";
+  }catch(err){
+   products.shift();
+   message.textContent="Stockage plein. Essaie une photo plus petite.";
+  }
+ };
+ reader.readAsDataURL(file);
+});
+
+search.addEventListener("input",displayProducts);
+displayProducts();
+</script>
 </body>
 </html>
 
 
 
-
-<!
