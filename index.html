@@ -146,7 +146,20 @@ reader.onload = function(){
 
     products.unshift(product);
 
-    try{
+    try{const { error } = await supabaseClient
+  .from("Products")
+  .insert([{
+    Name: name,
+    Description: category,
+    Price: Number(price),
+    Image: compressedPhoto
+  }]);
+
+if (error) {
+  products.shift();
+  message.textContent = "Erreur Supabase : " + error.message;
+  return;
+try}
       localStorage.setItem("guineeMarketProducts", JSON.stringify(products));
       displayProducts();
       form.reset();
@@ -157,7 +170,7 @@ reader.onload = function(){
     }
   };
 
-  img.onerror = function(){
+  img.onload = async function(){
     message.textContent = "Impossible de lire cette photo.";
   };
 
