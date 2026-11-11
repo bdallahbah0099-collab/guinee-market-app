@@ -171,6 +171,17 @@ reader.readAsDataURL(file);
 search.addEventListener("input",displayProducts);
 displayProducts();
 </script>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://qbxpampyrwqsiqvuehsb.supabase.co";
+const SUPABASE_KEY = "COLLE_TA_CLE_PUBLISHABLE_ICI";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+</script>
 </body>
 </html>
 
