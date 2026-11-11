@@ -1,255 +1,66 @@
 
-
-
-
 <!DOCTYPE html>
-
 <html lang="fr">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guinée Market</title>
-
 <style>
-
 *{box-sizing:border-box}
-
-body{margin:0;font-family:Arial,sans-serif;background:#f4f6f5;color:#222}
-
-header{background:#087b43;color:white;padding:20px;text-align:center}
-
-header h1{margin:0;font-size:27px}
-
-header p{margin:7px}
-
+body{margin:0;font-family:Arial;background:#f4f6f4;color:#222}
+header{background:#087b43;color:white;padding:22px;text-align:center}
+header h1{margin:0}
 .search{padding:15px}
-
-input,select{width:100%;padding:14px;border:1px solid #ccc;border-radius:9px;font-size:16px;margin-bottom:10px}
-
-.categories{display:flex;gap:9px;overflow:auto;padding:5px 15px 15px}
-
-.categories button{border:0;background:white;padding:12px 17px;border-radius:20px;white-space:nowrap}
-
-.categories button.active{background:#087b43;color:white}
-
-h2{padding:0 15px;font-size:20px}
-
-.products{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
-
-.card{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 7px #ddd}
-
-.card img{width:100%;height:145px;object-fit:cover;background:#eee}
-
-.info{padding:10px}
-
-.price{color:#087b43;font-weight:bold;font-size:17px}
-
-.info button,.publish{width:100%;padding:11px;border:0;border-radius:8px;background:#087b43;color:white;margin-top:8px}
-
-.publish{font-size:17px;padding:15px}
-
-form{padding:15px;background:white;margin:15px;border-radius:12px}
-
-footer{text-align:center;padding:25px;background:#087b43;color:white;margin-top:20px}
-
-.empty{text-align:center;padding:30px}
-
+input{width:100%;padding:14px;border:1px solid #ddd;border-radius:10px}
+h2{padding:0 15px}
+.categories{display:flex;gap:10px;overflow:auto;padding:10px 15px}
+.categories button{padding:12px;border:0;border-radius:20px;background:white;white-space:nowrap}
+.categories button:first-child{background:#087b43;color:white}
+.products{padding:15px}
+.product{background:white;padding:18px;margin-bottom:12px;border-radius:12px}
+.product button{background:#087b43;color:white;border:0;padding:10px 15px;border-radius:8px}
+footer{text-align:center;padding:20px;color:#666}
 </style>
-
 </head>
-
 <body>
-
 <header>
-
 <h1>🇬🇳 Guinée Market</h1>
-
 <p>Achetez et vendez facilement en Guinée</p>
-
 </header>
-
 <div class="search">
-
-<input id="search" placeholder="🔍 Rechercher un produit...">
-
+<input type="search" placeholder="Rechercher un produit...">
 </div>
-
-<div class="categories" id="categories">
-
-<button class="active" onclick="filter('Tous',this)">Tous</button>
-
-<button onclick="filter('Téléphones',this)">Téléphones</button>
-
-<button onclick="filter('Mode',this)">Mode</button>
-
-<button onclick="filter('Maison',this)">Maison</button>
-
-<button onclick="filter('Véhicules',this)">Véhicules</button>
-
+<h2>Catégories</h2>
+<div class="categories">
+<button>Tout</button>
+<button>Téléphones</button>
+<button>Vêtements</button>
+<button>Maison</button>
+<button>Véhicules</button>
 </div>
-
-<h2>🛍️ Produits disponibles</h2>
-
-<div class="products" id="products"></div>
-
-<h2>➕ Vendre un produit</h2>
-
-<form id="form">
-
-<input id="name" placeholder="Nom du produit" required>
-
-<input id="price" type="number" placeholder="Prix en GNF" required>
-
-<select id="category">
-
-<option>Téléphones</option>
-
-<option>Mode</option>
-
-<option>Maison</option>
-
-<option>Véhicules</option>
-
-</select>
-
-<input id="image" type="url" placeholder="Lien de la photo du produit">
-
-<input id="phone" placeholder="Numéro WhatsApp" required>
-
-<button class="publish">Publier mon produit</button>
-
-</form>
-
-<footer>
-
-<strong>Guinée Market 🇬🇳</strong>
-
-<p>Le marché en ligne de la Guinée.</p>
-
-</footer>
-
-<script>
-
-let items=JSON.parse(localStorage.getItem('gm_items')||'[]');
-
-let selected='Tous';
-
-function render(){
-
-let q=document.getElementById('search').value.toLowerCase();
-
-let list=items.filter(p=>
-
-(selected==='Tous'||p.category===selected)&&
-
-p.name.toLowerCase().includes(q)
-
-);
-
-let area=document.getElementById('products');
-
-area.innerHTML='';
-
-if(!list.length){area.innerHTML='<div class="empty">Aucun produit trouvé.</div>';return}
-
-list.forEach(p=>{
-
-let card=document.createElement('div');
-
-card.className='card';
-
-let img=document.createElement('img');
-
-img.src=p.image||'https://placehold.co/400x300?text=Produit';
-
-img.alt=p.name;
-
-let info=document.createElement('div');
-
-info.className='info';
-
-let title=document.createElement('strong');
-
-title.textContent=p.name;
-
-let price=document.createElement('p');
-
-price.className='price';
-
-price.textContent=Number(p.price).toLocaleString('fr-FR')+' GNF';
-
-let contact=document.createElement('button');
-
-contact.textContent='Contacter le vendeur';
-
-contact.onclick=()=>window.open('https://wa.me/'+p.phone.replace(/\D/g,''),'_blank');
-
-info.append(title,price,contact);
-
-card.append(img,info);
-
-area.append(card);
-
-});
-
-}
-
-function filter(category,button){
-
-selected=category;
-
-document.querySelectorAll('.categories button').forEach(b=>b.classList.remove('active'));
-
-button.classList.add('active');
-
-render();
-
-}
-
-document.getElementById('search').addEventListener('input',render);
-
-document.getElementById('form').addEventListener('submit',e=>{
-
-e.preventDefault();
-
-items.unshift({
-
-name:document.getElementById('name').value,
-
-price:document.getElementById('price').value,
-
-category:document.getElementById('category').value,
-
-image:document.getElementById('image').value,
-
-phone:document.getElementById('phone').value
-
-});
-
-localStorage.setItem('gm_items',JSON.stringify(items));
-
-e.target.reset();
-
-selected='Tous';
-
-document.querySelectorAll('.categories button').forEach(b=>b.classList.remove('active'));
-
-document.querySelector('.categories button').classList.add('active');
-
-render();
-
-alert('Produit publié sur cet appareil !');
-
-});
-
-render();
-
-</script>
-
+<h2>Produits populaires</h2>
+<div class="products">
+<div class="product">
+<h3>📱 Téléphones</h3>
+<p>Découvrez les téléphones disponibles.</p>
+<button>Voir les produits</button>
+</div>
+<div class="product">
+<h3>👕 Vêtements</h3>
+<p>Découvrez les vêtements disponibles.</p>
+<button>Voir les produits</button>
+</div>
+<div class="product">
+<h3>🏠 Maison</h3>
+<p>Découvrez les articles pour la maison.</p>
+<button>Voir les produits</button>
+</div>
+</div>
+<footer>© 2026 Guinée Market</footer>
 </body>
-
 </html>
+
+
+
+
+<!
