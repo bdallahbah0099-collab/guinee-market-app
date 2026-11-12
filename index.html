@@ -55,146 +55,163 @@ h2{margin-top:25px}
 <div class="products" id="products"></div>
 </main>
 
-<script>
-const form=document.getElementById("productForm");
-const list=document.getElementById("products");
-const message=document.getElementById("message");
-const search=document.getElementById("search");
 
-let products=[];
-try{
- products=JSON.parse(localStorage.getItem("guineeMarketProducts")||"[]");
-}catch(e){products=[];}
-
-function displayProducts(){
- const term=search.value.toLowerCase();
- list.innerHTML="";
- const filtered=products.filter(p=>
-  (p.name+" "+p.category).toLowerCase().includes(term)
- );
- if(filtered.length===0){
-  list.innerHTML="<p>Aucun produit pour le moment.</p>";
-  return;
- }
- filtered.forEach(p=>{
-  const card=document.createElement("div");
-  card.className="product";
-  const img=document.createElement("img");
-  img.src=p.photo;
-  img.alt=p.name;
-  const title=document.createElement("h3");
-  title.textContent=p.name;
-  const price=document.createElement("p");
-  price.className="price";
-  price.textContent=Number(p.price).toLocaleString("fr-FR")+" GNF";
-  const category=document.createElement("p");
-  category.textContent=p.category;
-  card.append(img,title,price,category);
-  list.appendChild(card);
- });
-}
-
-form.addEventListener("submit",function(e){
- e.preventDefault();
- const name=document.getElementById("name").value.trim();
- const price=document.getElementById("price").value;
- const category=document.getElementById("category").value;
- const file=document.getElementById("photo").files[0];
-
- if(!name||!price||Number(price)<=0||!category||!file){
-  message.textContent="Remplis tous les champs.";
-  return;
- }
-if(file.size>5000000){
-  message.textContent="Choisis une photo de moins de 1,5 Mo.";
-  return;
- }
- 
-const reader = new FileReader();
-
-reader.onload = function(){
-  const img = new Image();
-
-  img.onload = function(){
-    const canvas = document.createElement("canvas");
-    const max = 800;
-    let width = img.width;
-    let height = img.height;
-
-    if(width > height && width > max){
-      height = Math.round(height * max / width);
-      width = max;
-    } else if(height > max){
-      width = Math.round(width * max / height);
-      height = max;
-    }
-
-    canvas.width = width;
-    canvas.height = height;
-
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, width, height);
-
-    const compressedPhoto = canvas.toDataURL("image/jpeg", 0.55);
-
-    const product = {
-      name,
-      price,
-      category,
-      photo: compressedPhoto
-    };
-
-    products.unshift(product);
-
-    try{const { error } = await supabaseClient
-  .from("Products")
-  .insert([{
-    Name: name,
-    Description: category,
-    Price: Number(price),
-    Image: compressedPhoto
-  }]);
-
-if (error) {
-  products.shift();
-  message.textContent = "Erreur Supabase : " + error.message;
-  return;
-try}
-      localStorage.setItem("guineeMarketProducts", JSON.stringify(products));
-      displayProducts();
-      form.reset();
-      message.textContent = "Produit publié avec succès !";
-    }catch(err){
-      products.shift();
-      message.textContent = "Stockage plein. Supprime quelques anciennes annonces.";
-    }
-  };
-
-  img.onload = async function(){
-    message.textContent = "Impossible de lire cette photo.";
-  };
-
-  img.src = reader.result;
-};
-
-reader.readAsDataURL(file);
-
-});
-
-search.addEventListener("input",displayProducts);
-displayProducts();
-</script>
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://qbxpampyrwqsiqvuehsb.supabase.co";
-const SUPABASE_KEY = "sb_publishable_jGnJAvt2TPpuSedHMkzScg_g4x1YhZo";
+const SUPABASE_KEY = "sb_publishable_jGnJAvt2TPpuSedHMkzScg_g4x1Y1hZo";
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+
+const form = document.getElementById("productForm");
+const list = document.getElementById("products");
+const message = document.getElementById("message");
+const search = document.getElementById("search");
+
+let products = [];
+
+function displayProducts() {
+  const term = search.value.toLowerCase();
+  list.innerHTML = "";
+
+  const filtered = products.filter(p =>
+    (p.name + " " + p.category).toLowerCase().includes(term)
+  );
+
+  if (filtered.length === 0) {
+    list.innerHTML = "<p>Aucun produit pour le moment.</p>";
+    return;
+  }
+
+  filtered.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product";
+
+    const img = document.createElement("img");
+    img.src = p.photo;
+    img.alt = p.name;
+
+    const title = document.createElement("h3");
+    title.textContent = p.name;
+
+    const price = document.createElement("p");
+    price.className = "price";
+    price.textContent =
+      Number(p.price).toLocaleString("fr-FR") + " GNF";
+
+    const category = document.createElement("p");
+    category.textContent = p.category;
+
+    card.append(img, title, price, category);
+    list.appendChild(card);
+  });
+}
+
+async function loadProducts() {
+  const { data, error } = await supabaseClient
+    .from("Products")
+    .select("id, name, price, category, photo")
+    .order("id", { ascending: false });
+
+  if (error) {
+    message.textContent = "Erreur : " + error.message;
+    return;
+  }
+
+  products = data || [];
+  displayProducts();
+}
+
+function compressPhoto(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = function() {
+      const img = new Image();
+
+      img.onload = function() {
+        const canvas = document.createElement("canvas");
+        const max = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height && width > max) {
+          height = Math.round(height * max / width);
+          width = max;
+        } else if (height > max) {
+          width = Math.round(width * max / height);
+          height = max;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        resolve(canvas.toDataURL("image/jpeg", 0.55));
+      };
+
+      img.onerror = () => reject(new Error("Photo illisible."));
+      img.src = reader.result;
+    };
+
+    reader.onerror = () => reject(new Error("Lecture impossible."));
+    reader.readAsDataURL(file);
+  });
+}
+
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const price = Number(document.getElementById("price").value);
+  const category = document.getElementById("category").value;
+  const file = document.getElementById("photo").files[0];
+
+  if (!name || price <= 0 || !category || !file) {
+    message.textContent = "Remplis tous les champs.";
+    return;
+  }
+
+  if (file.size > 5000000) {
+    message.textContent = "Photo trop volumineuse (maximum 5 Mo).";
+    return;
+  }
+
+  message.textContent = "Publication en cours...";
+
+  try {
+    const photo = await compressPhoto(file);
+
+    const { error } = await supabaseClient
+      .from("Products")
+      .insert([{
+        name: name,
+        price: price,
+        category: category,
+        photo: photo
+      }]);
+
+    if (error) throw error;
+
+    form.reset();
+    message.textContent = "Produit publié avec succès !";
+    await loadProducts();
+
+  } catch (error) {
+    message.textContent = "Erreur : " + error.message;
+  }
+});
+
+search.addEventListener("input", displayProducts);
+
+loadProducts();
 </script>
+
 </body>
 </html>
 
